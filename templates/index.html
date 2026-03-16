@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TSPPG Management System</title>
+
+<link rel="stylesheet" href="/static/fontawesome.min.css">
+<link rel="stylesheet" href="/static/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/webfonts/fa-solid-900.ttf" as="font" type="font/ttf" crossorigin>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="app-header">
+
+<h1>
+<i class="fas fa-building"></i>
+PG Management System
+</h1>
+
+<div class="export-buttons">
+    <div class="export-group">
+        <h3><i class="fas fa-users"></i> All Tenants</h3>
+        <button class="btn btn-primary" onclick="window.open('/export/all_tenants/csv')">
+            <i class="fas fa-file-csv"></i> Export CSV
+        </button>
+        <button class="btn btn-danger" onclick="window.open('/export/all_tenants/pdf')">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+    </div>
+    <div class="export-group">
+        <h3><i class="fas fa-user-times"></i> Former Tenants</h3>
+        <button class="btn btn-primary" onclick="window.open('/export/former_tenants/csv')">
+            <i class="fas fa-file-csv"></i> Export CSV
+        </button>
+        <button class="btn btn-danger" onclick="window.open('/export/former_tenants/pdf')">
+            <i class="fas fa-file-pdf"></i> Export PDF
+        </button>
+    </div>
+</div>
+
+<button class="primary-btn" onclick="addFloor()">
+<i class="fas fa-plus-circle"></i>
+Add Floor
+</button>
+
+</div>
+
+<h2 class="dashboard-title">
+<i class="fas fa-chart-line"></i>
+PG Dashboard
+</h2>
+
+<div id="dashboard" class="dashboard"></div>
+
+</div>
+
+<div id="loadingOverlay" class="loading-overlay">
+<div class="loading"></div>
+</div>
+
+
+<!-- TENANT FORM -->
+
+<div id="tenantPopup" class="popup">
+
+<div class="popup-content">
+
+<div class="popup-header">
+<h3 id="formTitle">Tenant Registration</h3>
+<button class="close-btn" onclick="closeTenantPopup()">×</button>
+</div>
+
+<div class="form-group">
+<label>Name</label>
+<input id="t_name" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Phone</label>
+<input id="t_phone" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Email</label>
+<input id="t_email" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Father Name</label>
+<input id="t_father" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Mother Name</label>
+<input id="t_mother" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Address</label>
+<textarea id="t_address" class="form-textarea"></textarea>
+</div>
+
+<div class="form-group">
+<label>Street</label>
+<input id="t_street" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Area</label>
+<input id="t_area" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Pincode</label>
+<input id="t_pincode" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Date of Birth</label>
+<input type="date" id="t_dob" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Office Name</label>
+<input id="t_office_name" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Office Address</label>
+<textarea id="t_office_address" class="form-textarea"></textarea>
+</div>
+
+<div class="form-group">
+<label>Room Type</label>
+<input id="t_room_type" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Emergency Contact Name</label>
+<input id="t_emergency_name" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Emergency Contact Phone</label>
+<input id="t_emergency_phone" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Emergency Contact Relation</label>
+<input id="t_emergency_relation" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Aadhaar Number</label>
+<input id="t_aadhar_number" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Check-in Date</label>
+<input type="date" id="t_checkin" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Deposit</label>
+<input id="t_deposit" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Rent</label>
+<input id="t_rent" class="form-input">
+</div>
+
+<div class="form-group">
+<label>Photo</label>
+<input type="file" id="t_photo">
+</div>
+
+<div class="form-group">
+<label>Aadhaar</label>
+<input type="file" id="t_aadhar">
+</div>
+
+<div class="form-actions">
+
+<button onclick="saveTenant()">Save</button>
+<button onclick="closeTenantPopup()">Cancel</button>
+
+</div>
+
+</div>
+</div>
+
+
+<!-- TENANT PROFILE -->
+
+<div id="tenantViewPopup" class="popup">
+
+<div class="popup-content">
+
+<div class="popup-header">
+<h3>Tenant Profile</h3>
+<button class="close-btn" onclick="closeTenantView()">×</button>
+</div>
+
+<div class="tenant-profile">
+
+<div class="profile-avatar">
+<img id="view_photo">
+</div>
+
+<div class="info-grid">
+
+<div class="info-item">
+<div class="info-label">Name</div>
+<div id="view_name"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Phone</div>
+<div id="view_phone"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Email</div>
+<div id="view_email"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Father</div>
+<div id="view_father"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Mother</div>
+<div id="view_mother"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Address</div>
+<div id="view_address"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Street</div>
+<div id="view_street"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Area</div>
+<div id="view_area"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Pincode</div>
+<div id="view_pincode"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Date of Birth</div>
+<div id="view_dob"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Office Name</div>
+<div id="view_office_name"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Office Address</div>
+<div id="view_office_address"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Room</div>
+<div id="view_room"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Bed</div>
+<div id="view_bed"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Room Type</div>
+<div id="view_room_type"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Emergency Name</div>
+<div id="view_emergency_name"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Emergency Phone</div>
+<div id="view_emergency_phone"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Emergency Relation</div>
+<div id="view_emergency_relation"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Aadhaar Number</div>
+<div id="view_aadhar_number"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Check-in</div>
+<div id="view_checkin"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Deposit</div>
+<div id="view_deposit"></div>
+</div>
+
+<div class="info-item">
+<div class="info-label">Rent</div>
+<div id="view_rent"></div>
+</div>
+
+</div>
+
+<div class="action-buttons">
+
+<button onclick="editTenant()">Edit</button>
+<button onclick="downloadTenant()">Download PDF</button>
+<button onclick="removeTenant()">Remove Tenant</button>
+<button id="getFormLinkBtn" onclick="generateFormLinkForCurrentBed()" style="display:none;">Get Form Link</button>
+<button id="copyLinkBtn" onclick="copyGeneratedLink()" style="display:none;">📋 Copy Link</button>
+<button id="deleteBedBtn" onclick="deleteCurrentBed()" style="display:none;">Delete Bed</button>
+<button id="addTenantBtn" onclick="addTenantFromView()" style="display:none;">Add Tenant</button>
+<button onclick="closeTenantView()">Close</button>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<script>
+
+let selectedFloor=null
+let selectedRoom=null
+let selectedBed=null
+let selectedTenantId=null
+let editMode=false
+let tenantData=null
+let generatedFormLink=null
+
+async function loadBeds(){
+
+let res = await fetch("/beds")
+let data = await res.json()
+
+renderDashboard(data)
+
+}
+
+
+function renderDashboard(data){
+
+const dashboard=document.getElementById("dashboard")
+dashboard.innerHTML=""
+
+let floors={}
+
+data.forEach(b=>{
+
+if(!floors[b.floor]) floors[b.floor]={}
+
+if(!floors[b.floor][b.room]) floors[b.floor][b.room]=[]
+
+floors[b.floor][b.room].push(b)
+
+})
+
+
+for(const floor in floors){
+
+let floorDiv=document.createElement("div")
+floorDiv.className="floor"
+
+floorDiv.innerHTML=`
+
+<div class="floor-header">
+
+<div class="floor-title">
+<div class="floor-icon"><i class="fas fa-layer-group"></i></div>
+<h2>${floor}</h2>
+</div>
+
+<div class="floor-actions">
+
+<button class="btn btn-primary"
+onclick="addRoom('${floor}')">
+Add Room
+</button>
+
+<button class="btn btn-danger"
+onclick="deleteFloor('${floor}')">
+Delete
+</button>
+
+</div>
+
+</div>
+`
+
+
+for(const room in floors[floor]){
+
+let roomDiv=document.createElement("div")
+roomDiv.className="room"
+
+roomDiv.innerHTML=`
+
+<div class="room-header">
+
+<h3>${room}</h3>
+
+<div class="room-actions">
+
+<button class="btn btn-success"
+onclick="addBeds('${floor}','${room}')">
+Add Beds
+</button>
+
+<button class="btn btn-danger"
+onclick="deleteRoom('${floor}','${room}')">
+Delete
+</button>
+
+</div>
+
+</div>
+`
+
+let bedsGrid=document.createElement("div")
+bedsGrid.className="bed-grid"
+
+floors[floor][room].forEach(b=>{
+
+let card=document.createElement("div")
+card.className="bed-card"
+
+if(b.tenant){
+
+card.classList.add("occupied")
+
+card.innerHTML=`
+<img class="avatar" src="/photo/${b.id}">
+<div>${b.bed}</div>
+<div>${b.tenant}</div>
+`
+
+card.onclick=()=>showTenantProfile(b)
+
+}else{
+
+card.classList.add("empty")
+
+card.innerHTML=`
+<div>${b.bed}</div>
+<div>Empty</div>
+`
+
+card.onclick=()=>bedClick(b)
+
+}
+
+bedsGrid.appendChild(card)
+
+})
+
+roomDiv.appendChild(bedsGrid)
+floorDiv.appendChild(roomDiv)
+
+}
+
+dashboard.appendChild(floorDiv)
+
+}
+
+}
+
+
+async function generateFormLink(bedId, floor, room, bed) {
+    try {
+        console.log('Starting form link generation for bed:', bedId, floor, room, bed);
+        
+        const response = await fetch(`/generate-form-link/${bedId}`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"}
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        const result = await response.json();
+        console.log('Response result:', result);
+        
+        if (result.success) {
+            // Store the generated link
+            generatedFormLink = result.form_url;
+            
+            // Show copy link button and hide get form link button
+            document.getElementById("getFormLinkBtn").style.display = "none";
+            document.getElementById("copyLinkBtn").style.display = "inline-block";
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(result.form_url);
+            alert(`Form link copied to clipboard!\n\n${result.form_url}`);
+            console.log('Form link copied successfully:', result.form_url);
+        } else {
+            console.error('Form link generation failed:', result);
+            alert(`Failed to generate form link: ${result.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Network error in generateFormLink:', error);
+        alert('Error generating form link. Please check console for details.');
+    }
+}
+
+async function generateFormLinkForCurrentBed() {
+    if (selectedTenantId && selectedFloor && selectedRoom && selectedBed) {
+        console.log('Generating form link for bed:', selectedTenantId, selectedFloor, selectedRoom, selectedBed);
+        await generateFormLink(selectedTenantId, selectedFloor, selectedRoom, selectedBed);
+    } else {
+        console.error('Missing required data for form link generation');
+        alert('Unable to generate form link. Please try again.');
+    }
+}
+
+async function deleteCurrentBed() {
+    if (selectedFloor && selectedRoom && selectedBed) {
+        await deleteBed(selectedFloor, selectedRoom, selectedBed);
+        closeTenantView();
+        loadBeds();
+    }
+}
+
+async function addFloor(){
+
+let floor=prompt("Floor name")
+
+if(!floor) return
+
+await fetch("/add_floor",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({floor})
+})
+
+loadBeds()
+
+}
+
+
+async function addRoom(floor){
+
+let room=prompt("Room name")
+
+if(!room) return
+
+await fetch("/add_room",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({floor,room})
+})
+
+loadBeds()
+
+}
+
+
+async function addBeds(floor,room){
+
+let beds=prompt("Number of beds")
+
+if(!beds) return
+
+await fetch("/add_beds",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({floor,room,beds})
+})
+
+loadBeds()
+
+}
+
+
+async function deleteRoom(floor,room){
+
+if(!confirm("Delete room?")) return
+
+await fetch("/delete_room",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({floor,room})
+})
+
+loadBeds()
+
+}
+
+
+async function deleteFloor(floor){
+
+if(!confirm("Delete floor?")) return
+
+await fetch("/delete_floor",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({floor})
+})
+
+loadBeds()
+
+}
+
+
+async function deleteBed(floor,room,bed){
+
+if(!confirm("Delete this bed?")) return
+
+// Trim whitespace to match database exactly
+const cleanFloor = floor.trim()
+const cleanRoom = room.trim()
+const cleanBed = bed.trim()
+
+try{
+const response = await fetch("/delete_bed",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({floor:cleanFloor,room:cleanRoom,bed:cleanBed})
+})
+
+const result = await response.json()
+
+if(result.success){
+alert("Bed deleted successfully!")
+loadBeds()
+}else{
+alert(`Failed to delete bed: ${result.error || 'Unknown error'}`)
+}
+}catch(error){
+console.error("Error deleting bed:", error)
+alert(`Error deleting bed: ${error.message || 'Unknown error'}`)
+}
+
+}
+
+
+function bedClick(b){
+    if(b.bed === "" || b.bed === null){
+        alert("Please add beds to this room first before adding tenants!")
+        return
+    }
+    selectedFloor=b.floor
+    selectedRoom=b.room
+    selectedBed=b.bed
+    selectedTenantId=b.id // Use bed ID for form link generation
+    showTenantProfile(b) // Use showTenantProfile to handle displaying the view and buttons
+}
+
+
+function closeTenantPopup(){
+document.getElementById("tenantPopup").style.display="none"
+}
+
+
+async function saveTenant(){
+
+let form=new FormData()
+
+form.append("name",t_name.value)
+form.append("phone",t_phone.value)
+form.append("email",t_email.value)
+form.append("father",t_father.value)
+form.append("mother",t_mother.value)
+form.append("address",t_address.value)
+form.append("street",t_street.value)
+form.append("area",t_area.value)
+form.append("pincode",t_pincode.value)
+form.append("dob",t_dob.value)
+form.append("aadhar_number",t_aadhar_number.value)
+form.append("office_name",t_office_name.value)
+form.append("office_address",t_office_address.value)
+form.append("deposit",t_deposit.value)
+form.append("rent",t_rent.value)
+form.append("room_type",t_room_type.value)
+form.append("emergency_name",t_emergency_name.value)
+form.append("emergency_phone",t_emergency_phone.value)
+form.append("emergency_relation",t_emergency_relation.value)
+form.append("checkin",t_checkin.value)
+
+form.append("floor",selectedFloor)
+form.append("room",selectedRoom)
+form.append("bed",selectedBed)
+
+// Add photo and aadhar files if they exist
+let photoInput=document.getElementById("t_photo")
+let aadharInput=document.getElementById("t_aadhar")
+
+if(photoInput.files.length > 0){
+form.append("photo", photoInput.files[0])
+}
+
+if(aadharInput.files.length > 0){
+form.append("aadhar", aadharInput.files[0])
+}
+
+let url="/add_tenant"
+
+if(editMode) url="/update_tenant"
+
+await fetch(url,{method:"POST",body:form})
+
+closeTenantPopup()
+loadBeds()
+editMode=false
+
+}
+
+
+async function addTenantFromView() {
+    closeTenantView();
+    document.getElementById("formTitle").innerText="Add Tenant"
+    
+    // Clear form fields
+    t_name.value = ""
+    t_phone.value = ""
+    t_email.value = ""
+    t_father.value = ""
+    t_mother.value = ""
+    t_address.value = ""
+    t_street.value = ""
+    t_area.value = ""
+    t_pincode.value = ""
+    t_dob.value = ""
+    t_office_name.value = ""
+    t_office_address.value = ""
+    t_deposit.value = ""
+    t_rent.value = ""
+    t_room_type.value = ""
+    t_emergency_name.value = ""
+    t_emergency_phone.value = ""
+    t_emergency_relation.value = ""
+    t_aadhar_number.value = ""
+    t_checkin.value = ""
+    
+    // Clear file inputs
+    document.getElementById("t_photo").value = ""
+    document.getElementById("t_aadhar").value = ""
+    
+    editMode = false
+    document.getElementById("tenantPopup").style.display="flex"
+}
+
+async function showTenantProfile(b){
+
+selectedTenantId=b.id
+selectedFloor=b.floor
+selectedRoom=b.room
+selectedBed=b.bed
+
+// Reset form link buttons
+resetFormLinkButtons();
+
+// Show/hide buttons based on tenant occupancy
+const getFormLinkBtn = document.getElementById("getFormLinkBtn");
+const deleteBedBtn = document.getElementById("deleteBedBtn");
+const addTenantBtn = document.getElementById("addTenantBtn");
+
+if (b.tenant) {
+    // Bed is occupied - fetch tenant data and hide form link/delete/add buttons
+    let res=await fetch("/tenant/"+b.id)
+    tenantData=await res.json()
+    
+    view_photo.src="/photo/"+b.id
+    view_name.innerText=tenantData.tenant_name
+    view_phone.innerText=tenantData.phone
+    view_email.innerText=tenantData.email
+    view_father.innerText=tenantData.father_name
+    view_mother.innerText=tenantData.mother_name
+    view_address.innerText=tenantData.address
+    view_street.innerText=tenantData.street
+    view_area.innerText=tenantData.area
+    view_pincode.innerText=tenantData.pincode
+    view_dob.innerText=tenantData.dob
+    view_office_name.innerText=tenantData.office_name
+    view_office_address.innerText=tenantData.office_address
+    view_room.innerText=tenantData.room
+    view_bed.innerText=tenantData.bed
+    view_room_type.innerText=tenantData.room_type
+    view_emergency_name.innerText=tenantData.emergency_name
+    view_emergency_phone.innerText=tenantData.emergency_phone
+    view_emergency_relation.innerText=tenantData.emergency_relation
+    view_aadhar_number.innerText=tenantData.aadhar_number
+    view_checkin.innerText=tenantData.checkin_date
+    view_deposit.innerText=tenantData.deposit
+    view_rent.innerText=tenantData.rent
+    
+    getFormLinkBtn.style.display = "none";
+    deleteBedBtn.style.display = "none";
+    addTenantBtn.style.display = "none";
+} else {
+    // Bed is empty - show basic info and form link/delete/add buttons
+    view_photo.src = "";
+    view_name.innerText = "No Tenant";
+    view_phone.innerText = "";
+    view_email.innerText = "";
+    view_father.innerText = "";
+    view_mother.innerText = "";
+    view_address.innerText = "";
+    view_street.innerText = "";
+    view_area.innerText = "";
+    view_pincode.innerText = "";
+    view_dob.innerText = "";
+    view_office_name.innerText = "";
+    view_office_address.innerText = "";
+    view_room.innerText = b.room;
+    view_bed.innerText = b.bed;
+    view_room_type.innerText = "";
+    view_emergency_name.innerText = "";
+    view_emergency_phone.innerText = "";
+    view_emergency_relation.innerText = "";
+    view_aadhar_number.innerText = "";
+    view_checkin.innerText = "";
+    view_deposit.innerText = "";
+    view_rent.innerText = "";
+    
+    getFormLinkBtn.style.display = "inline-block";
+    deleteBedBtn.style.display = "inline-block";
+    addTenantBtn.style.display = "inline-block";
+}
+
+document.getElementById("tenantViewPopup").style.display="flex"
+
+}
+
+
+function closeTenantView(){
+document.getElementById("tenantViewPopup").style.display="none"
+}
+
+
+function editTenant(){
+
+document.getElementById("formTitle").innerText="Edit Tenant"
+
+t_name.value=tenantData.tenant_name
+t_phone.value=tenantData.phone
+t_email.value=tenantData.email
+t_father.value=tenantData.father_name
+t_mother.value=tenantData.mother_name
+t_address.value=tenantData.address
+t_street.value=tenantData.street
+t_area.value=tenantData.area
+t_pincode.value=tenantData.pincode
+t_dob.value=tenantData.dob
+t_office_name.value=tenantData.office_name
+t_office_address.value=tenantData.office_address
+t_checkin.value=tenantData.checkin_date
+t_deposit.value=tenantData.deposit
+t_rent.value=tenantData.rent
+t_room_type.value=tenantData.room_type
+t_emergency_name.value=tenantData.emergency_name
+t_emergency_phone.value=tenantData.emergency_phone
+t_emergency_relation.value=tenantData.emergency_relation
+t_aadhar_number.value=tenantData.aadhar_number
+
+editMode=true
+
+closeTenantView()
+document.getElementById("tenantPopup").style.display="flex"
+
+}
+
+function downloadTenant(){
+window.open("/download_tenant/"+selectedTenantId)
+}
+
+
+async function removeTenant(){
+
+await fetch("/remove_tenant",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+floor:selectedFloor,
+room:selectedRoom,
+bed:selectedBed
+})
+})
+
+closeTenantView()
+loadBeds()
+
+}
+
+
+function copyGeneratedLink() {
+    if (generatedFormLink) {
+        navigator.clipboard.writeText(generatedFormLink);
+        alert(`Form link copied to clipboard!\n\n${generatedFormLink}`);
+        console.log('Form link copied again:', generatedFormLink);
+    } else {
+        alert('No form link available. Please generate a link first.');
+    }
+}
+
+function resetFormLinkButtons() {
+    // Reset button states when opening tenant view
+    document.getElementById("getFormLinkBtn").style.display = "none";
+    document.getElementById("copyLinkBtn").style.display = "none";
+    generatedFormLink = null;
+}
+
+loadBeds()
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Registration - {{ bed.floor }} {{ bed.room }} {{ bed.bed }}</title>
+    <link rel="stylesheet" href="/static/fontawesome.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .form-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .room-info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .form-textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            color: #155724;
+        }
+        .error-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h1><i class="fas fa-user-plus"></i> Tenant Registration Form</h1>
+            <p>Please fill in your details to register for this accommodation</p>
+        </div>
+        
+        <div class="room-info">
+            <i class="fas fa-bed"></i> Room: {{ bed.floor }} - {{ bed.room }} - {{ bed.bed }}
+        </div>
+        
+        <form id="tenantForm" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" class="form-input" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth *</label>
+                    <input type="date" id="dob" name="dob" class="form-input" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="father">Father's Name</label>
+                    <input type="text" id="father" name="father" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="mother">Mother's Name</label>
+                    <input type="text" id="mother" name="mother" class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Address *</label>
+                <textarea id="address" name="address" class="form-textarea" required></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="street">Street</label>
+                    <input type="text" id="street" name="street" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="area">Area</label>
+                    <input type="text" id="area" name="area" class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pincode">Pincode *</label>
+                    <input type="text" id="pincode" name="pincode" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="aadhar_number">Aadhaar Number *</label>
+                    <input type="text" id="aadhar_number" name="aadhar_number" class="form-input" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="office_name">Office Name</label>
+                    <input type="text" id="office_name" name="office_name" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="room_type">Room Type</label>
+                    <input type="text" id="room_type" name="room_type" class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="office_address">Office Address</label>
+                <textarea id="office_address" name="office_address" class="form-textarea"></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="deposit">Deposit Amount</label>
+                    <input type="text" id="deposit" name="deposit" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="rent">Monthly Rent</label>
+                    <input type="text" id="rent" name="rent" class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="checkin">Check-in Date *</label>
+                    <input type="date" id="checkin" name="checkin" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="emergency_name">Emergency Contact Name</label>
+                    <input type="text" id="emergency_name" name="emergency_name" class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="emergency_phone">Emergency Contact Phone</label>
+                    <input type="tel" id="emergency_phone" name="emergency_phone" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="emergency_relation">Emergency Contact Relation</label>
+                    <input type="text" id="emergency_relation" name="emergency_relation" class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="photo">Photo</label>
+                    <input type="file" id="photo" name="photo" accept="image/*" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="aadhar">Aadhaar Document</label>
+                    <input type="file" id="aadhar" name="aadhar" accept="image/*,.pdf" class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Submit Registration
+                </button>
+            </div>
+        </form>
+        
+        <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i> Submitting your registration...
+        </div>
+        
+        <div class="success-message">
+            <i class="fas fa-check-circle"></i> 
+            <h3>Registration Successful!</h3>
+            <p>Thank you for registering. Your details have been saved successfully.</p>
+        </div>
+        
+        <div class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <h3>Registration Failed</h3>
+            <p id="error-text">There was an error submitting your registration. Please try again.</p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('tenantForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loadingDiv = document.querySelector('.loading');
+            const successDiv = document.querySelector('.success-message');
+            const errorDiv = document.querySelector('.error-message');
+            const form = document.getElementById('tenantForm');
+            
+            // Show loading, hide form and messages
+            loadingDiv.style.display = 'block';
+            form.style.display = 'none';
+            successDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(`/submit-tenant-form/{{ token }}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    loadingDiv.style.display = 'none';
+                    successDiv.style.display = 'block';
+                } else {
+                    loadingDiv.style.display = 'none';
+                    errorDiv.style.display = 'block';
+                    document.getElementById('error-text').textContent = result.error || 'Registration failed. Please try again.';
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                document.getElementById('error-text').textContent = 'Network error. Please check your connection and try again.';
+            }
+        });
+    </script>
+</body>
+</html>
